@@ -5,7 +5,7 @@ Pod::Spec.new do |s|
   s.license  = { :type => 'BSD' }
   s.summary  = 'Full Database Encryption for SQLite.'
   s.homepage = 'https://www.zetetic.net/sqlcipher/'
-  s.author   = { 'Zetetic LLC' }
+  s.author   = 'Zetetic LLC'
   s.source = {
     "git": "https://github.com/neotreks/sqlcipher.git",
     "tag": "AccuTerrav4.4.3"
