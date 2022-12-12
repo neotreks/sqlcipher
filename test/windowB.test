@@ -9,6 +9,7 @@
 #
 #***********************************************************************
 # Test cases for RANGE BETWEEN and especially with NULLS LAST
+# and for varying separator handling by group_concat().
 #
 
 set testdir [file dirname $argv0]
@@ -335,5 +336,78 @@ do_execsql_test 7.4 {
     ORDER BY a RANGE BETWEEN 0 PRECEDING AND 2 PRECEDING
   ) FROM t1;
 } {{} 45 {} 45  7 {} 7 {} 8 {} 8 {}  abc 1001 abc 1001 xyz 3333}
+
+#-------------------------------------------------------------------------
+reset_db
+do_execsql_test 8.0 {
+  BEGIN TRANSACTION;
+    CREATE TABLE t1(a, c);
+    INSERT INTO t1 VALUES('aa', 111);
+    INSERT INTO t1 VALUES('BB', 660);
+    INSERT INTO t1 VALUES('CC', 938);
+    INSERT INTO t1 VALUES('dd', 979);
+  COMMIT;
+
+  CREATE INDEX i1 ON t1(a COLLATE nocase);
+}
+
+do_execsql_test 8.1 {
+  SELECT sum(c) OVER
+    (ORDER BY a COLLATE nocase RANGE BETWEEN 10.0 PRECEDING AND 5.0 PRECEDING)
+  FROM t1;
+} {111 660 938 979}
+
+do_execsql_test 9.0 {
+  CREATE TABLE seps(x);
+  INSERT INTO seps(x) VALUES ('1'), ('22'), ('333'), ('4444');
+  SELECT group_concat('-', x)
+    OVER ( ORDER BY x ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING )
+  FROM seps;
+} {-22- -22-333- -333-4444- -4444-}
+
+#-------------------------------------------------------------------------
+reset_db
+do_execsql_test 10.1 {
+  CREATE TABLE t1(i INTEGER PRIMARY KEY, v);
+  INSERT INTO t1 VALUES( 1, 'one' );
+  INSERT INTO t1 VALUES( 2, 'two' );
+}
+
+do_execsql_test 10.2 {
+  SELECT 
+    json_group_array( v ) OVER w,
+    json_group_array( v ) OVER w
+  FROM t1
+  window w as ( 
+    range between unbounded preceding and unbounded following 
+  )
+} {
+  {["one","two"]} 
+  {["one","two"]} 
+  {["one","two"]} 
+  {["one","two"]} 
+}
+
+do_execsql_test 10.3 {
+  SELECT 
+    group_concat( v ) OVER w,
+    json_group_array( v ) OVER w,
+    json_group_array( v ) OVER w,
+    group_concat( v ) OVER w
+  FROM t1
+  window w as ( 
+    range between unbounded preceding and unbounded following 
+  )
+} {
+  one,two
+  {["one","two"]} 
+  {["one","two"]} 
+  one,two
+
+  one,two
+  {["one","two"]} 
+  {["one","two"]} 
+  one,two
+}
 
 finish_test

@@ -151,8 +151,8 @@ SQLITE_NOINLINE int sqlite3RunVacuum(
   Btree *pTemp;           /* The temporary database we vacuum into */
   u32 saved_mDbFlags;     /* Saved value of db->mDbFlags */
   u64 saved_flags;        /* Saved value of db->flags */
-  int saved_nChange;      /* Saved value of db->nChange */
-  int saved_nTotalChange; /* Saved value of db->nTotalChange */
+  i64 saved_nChange;      /* Saved value of db->nChange */
+  i64 saved_nTotalChange; /* Saved value of db->nTotalChange */
   u32 saved_openFlags;    /* Saved value of db->openFlags */
   u8 saved_mTrace;        /* Saved trace settings */
   Db *pDb = 0;            /* Database to detach at end of vacuum */
@@ -239,10 +239,10 @@ SQLITE_NOINLINE int sqlite3RunVacuum(
 /* BEGIN SQLCIPHER */
 #ifdef SQLITE_HAS_CODEC
   if( db->nextPagesize ){
-    extern void sqlite3CodecGetKey(sqlite3*, int, void**, int*);
+    extern void sqlcipherCodecGetKey(sqlite3*, int, void**, int*);
     int nKey;
     char *zKey;
-    sqlite3CodecGetKey(db, iDb, (void**)&zKey, &nKey);
+    sqlcipherCodecGetKey(db, iDb, (void**)&zKey, &nKey);
     if( nKey ) db->nextPagesize = 0;
   }
 #endif
@@ -263,7 +263,9 @@ SQLITE_NOINLINE int sqlite3RunVacuum(
 
   /* Do not attempt to change the page size for a WAL database */
   if( sqlite3PagerGetJournalMode(sqlite3BtreePager(pMain))
-                                               ==PAGER_JOURNALMODE_WAL ){
+                                               ==PAGER_JOURNALMODE_WAL
+   && pOut==0
+  ){
     db->nextPagesize = 0;
   }
 
@@ -379,6 +381,7 @@ SQLITE_NOINLINE int sqlite3RunVacuum(
 
   assert( rc==SQLITE_OK );
   if( pOut==0 ){
+    nRes = sqlite3BtreeGetRequestedReserve(pTemp);
     rc = sqlite3BtreeSetPageSize(pMain, sqlite3BtreeGetPageSize(pTemp), nRes,1);
   }
 

@@ -19,7 +19,7 @@
 ** The sha3(X) function computes the SHA3 hash of the input X, or NULL if
 ** X is NULL.
 **
-** The sha3_query(Y) function evalutes all queries in the SQL statements of Y
+** The sha3_query(Y) function evaluates all queries in the SQL statements of Y
 ** and returns a hash of their results.
 **
 ** The SIZE argument is optional.  If omitted, the SHA3-256 hash algorithm
@@ -31,7 +31,10 @@ SQLITE_EXTENSION_INIT1
 #include <assert.h>
 #include <string.h>
 #include <stdarg.h>
+
+#ifndef SQLITE_AMALGAMATION
 typedef sqlite3_uint64 u64;
+#endif /* SQLITE_AMALGAMATION */
 
 /******************************************************************************
 ** The Hash Engine
@@ -433,6 +436,7 @@ static void SHA3Update(
   unsigned int nData
 ){
   unsigned int i = 0;
+  if( aData==0 ) return;
 #if SHA3_BYTEORDER==1234
   if( (p->nLoaded % 8)==0 && ((aData - (const unsigned char*)0)&7)==0 ){
     for(; i+7<nData; i+=8){

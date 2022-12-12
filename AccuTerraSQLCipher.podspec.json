@@ -14,10 +14,10 @@
   "requires_arc": false,
   "source": {
     "git": "https://github.com/neotreks/sqlcipher.git",
-    "tag": "AccuTerrav4.4.3"
+    "tag": "AccuTerrav4.5.2"
   },
   "summary": "Full Database Encryption for SQLite.",
-  "version": "4.4.3",
+  "version": "4.5.2",
   "subspecs": [
     {
       "compiler_flags": [
