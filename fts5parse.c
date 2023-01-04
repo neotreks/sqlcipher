@@ -355,9 +355,9 @@ struct yyParser {
 };
 typedef struct yyParser yyParser;
 
+#include <assert.h>
 #ifndef NDEBUG
 #include <stdio.h>
-#include <assert.h>
 static FILE *yyTraceFILE = 0;
 static char *yyTracePrompt = 0;
 #endif /* NDEBUG */
@@ -998,55 +998,6 @@ static YYACTIONTYPE yy_reduce(
   (void)yyLookahead;
   (void)yyLookaheadToken;
   yymsp = yypParser->yytos;
-  assert( yyruleno<(int)(sizeof(yyRuleName)/sizeof(yyRuleName[0])) );
-#ifndef NDEBUG
-  if( yyTraceFILE ){
-    yysize = yyRuleInfoNRhs[yyruleno];
-    if( yysize ){
-      fprintf(yyTraceFILE, "%sReduce %d [%s]%s, pop back to state %d.\n",
-        yyTracePrompt,
-        yyruleno, yyRuleName[yyruleno],
-        yyruleno<YYNRULE_WITH_ACTION ? "" : " without external action",
-        yymsp[yysize].stateno);
-    }else{
-      fprintf(yyTraceFILE, "%sReduce %d [%s]%s.\n",
-        yyTracePrompt, yyruleno, yyRuleName[yyruleno],
-        yyruleno<YYNRULE_WITH_ACTION ? "" : " without external action");
-    }
-  }
-#endif /* NDEBUG */
-
-  /* Check that the stack is large enough to grow by a single entry
-  ** if the RHS of the rule is empty.  This ensures that there is room
-  ** enough on the stack to push the LHS value */
-  if( yyRuleInfoNRhs[yyruleno]==0 ){
-#ifdef YYTRACKMAXSTACKDEPTH
-    if( (int)(yypParser->yytos - yypParser->yystack)>yypParser->yyhwm ){
-      yypParser->yyhwm++;
-      assert( yypParser->yyhwm == (int)(yypParser->yytos - yypParser->yystack));
-    }
-#endif
-#if YYSTACKDEPTH>0 
-    if( yypParser->yytos>=yypParser->yystackEnd ){
-      yyStackOverflow(yypParser);
-      /* The call to yyStackOverflow() above pops the stack until it is
-      ** empty, causing the main parser loop to exit.  So the return value
-      ** is never used and does not matter. */
-      return 0;
-    }
-#else
-    if( yypParser->yytos>=&yypParser->yystack[yypParser->yystksz-1] ){
-      if( yyGrowStack(yypParser) ){
-        yyStackOverflow(yypParser);
-        /* The call to yyStackOverflow() above pops the stack until it is
-        ** empty, causing the main parser loop to exit.  So the return value
-        ** is never used and does not matter. */
-        return 0;
-      }
-      yymsp = yypParser->yytos;
-    }
-#endif
-  }
 
   switch( yyruleno ){
   /* Beginning here are the reduction cases.  A typical example
@@ -1062,26 +1013,26 @@ static YYACTIONTYPE yy_reduce(
       case 0: /* input ::= expr */
 #line 82 "fts5parse.y"
 { sqlite3Fts5ParseFinished(pParse, yymsp[0].minor.yy24); }
-#line 1065 "fts5parse.sql"
+#line 1016 "fts5parse.sql"
         break;
       case 1: /* colset ::= MINUS LCP colsetlist RCP */
 #line 97 "fts5parse.y"
 { 
     yymsp[-3].minor.yy11 = sqlite3Fts5ParseColsetInvert(pParse, yymsp[-1].minor.yy11);
 }
-#line 1072 "fts5parse.sql"
+#line 1023 "fts5parse.sql"
         break;
       case 2: /* colset ::= LCP colsetlist RCP */
 #line 100 "fts5parse.y"
 { yymsp[-2].minor.yy11 = yymsp[-1].minor.yy11; }
-#line 1077 "fts5parse.sql"
+#line 1028 "fts5parse.sql"
         break;
       case 3: /* colset ::= STRING */
 #line 101 "fts5parse.y"
 {
   yylhsminor.yy11 = sqlite3Fts5ParseColset(pParse, 0, &yymsp[0].minor.yy0);
 }
-#line 1084 "fts5parse.sql"
+#line 1035 "fts5parse.sql"
   yymsp[0].minor.yy11 = yylhsminor.yy11;
         break;
       case 4: /* colset ::= MINUS STRING */
@@ -1090,13 +1041,13 @@ static YYACTIONTYPE yy_reduce(
   yymsp[-1].minor.yy11 = sqlite3Fts5ParseColset(pParse, 0, &yymsp[0].minor.yy0);
   yymsp[-1].minor.yy11 = sqlite3Fts5ParseColsetInvert(pParse, yymsp[-1].minor.yy11);
 }
-#line 1093 "fts5parse.sql"
+#line 1044 "fts5parse.sql"
         break;
       case 5: /* colsetlist ::= colsetlist STRING */
 #line 109 "fts5parse.y"
 { 
   yylhsminor.yy11 = sqlite3Fts5ParseColset(pParse, yymsp[-1].minor.yy11, &yymsp[0].minor.yy0); }
-#line 1099 "fts5parse.sql"
+#line 1050 "fts5parse.sql"
   yymsp[-1].minor.yy11 = yylhsminor.yy11;
         break;
       case 6: /* colsetlist ::= STRING */
@@ -1104,7 +1055,7 @@ static YYACTIONTYPE yy_reduce(
 { 
   yylhsminor.yy11 = sqlite3Fts5ParseColset(pParse, 0, &yymsp[0].minor.yy0); 
 }
-#line 1107 "fts5parse.sql"
+#line 1058 "fts5parse.sql"
   yymsp[0].minor.yy11 = yylhsminor.yy11;
         break;
       case 7: /* expr ::= expr AND expr */
@@ -1112,7 +1063,7 @@ static YYACTIONTYPE yy_reduce(
 {
   yylhsminor.yy24 = sqlite3Fts5ParseNode(pParse, FTS5_AND, yymsp[-2].minor.yy24, yymsp[0].minor.yy24, 0);
 }
-#line 1115 "fts5parse.sql"
+#line 1066 "fts5parse.sql"
   yymsp[-2].minor.yy24 = yylhsminor.yy24;
         break;
       case 8: /* expr ::= expr OR expr */
@@ -1120,7 +1071,7 @@ static YYACTIONTYPE yy_reduce(
 {
   yylhsminor.yy24 = sqlite3Fts5ParseNode(pParse, FTS5_OR, yymsp[-2].minor.yy24, yymsp[0].minor.yy24, 0);
 }
-#line 1123 "fts5parse.sql"
+#line 1074 "fts5parse.sql"
   yymsp[-2].minor.yy24 = yylhsminor.yy24;
         break;
       case 9: /* expr ::= expr NOT expr */
@@ -1128,7 +1079,7 @@ static YYACTIONTYPE yy_reduce(
 {
   yylhsminor.yy24 = sqlite3Fts5ParseNode(pParse, FTS5_NOT, yymsp[-2].minor.yy24, yymsp[0].minor.yy24, 0);
 }
-#line 1131 "fts5parse.sql"
+#line 1082 "fts5parse.sql"
   yymsp[-2].minor.yy24 = yylhsminor.yy24;
         break;
       case 10: /* expr ::= colset COLON LP expr RP */
@@ -1137,19 +1088,19 @@ static YYACTIONTYPE yy_reduce(
   sqlite3Fts5ParseSetColset(pParse, yymsp[-1].minor.yy24, yymsp[-4].minor.yy11);
   yylhsminor.yy24 = yymsp[-1].minor.yy24;
 }
-#line 1140 "fts5parse.sql"
+#line 1091 "fts5parse.sql"
   yymsp[-4].minor.yy24 = yylhsminor.yy24;
         break;
       case 11: /* expr ::= LP expr RP */
 #line 129 "fts5parse.y"
 {yymsp[-2].minor.yy24 = yymsp[-1].minor.yy24;}
-#line 1146 "fts5parse.sql"
+#line 1097 "fts5parse.sql"
         break;
       case 12: /* expr ::= exprlist */
       case 13: /* exprlist ::= cnearset */ yytestcase(yyruleno==13);
 #line 130 "fts5parse.y"
 {yylhsminor.yy24 = yymsp[0].minor.yy24;}
-#line 1152 "fts5parse.sql"
+#line 1103 "fts5parse.sql"
   yymsp[0].minor.yy24 = yylhsminor.yy24;
         break;
       case 14: /* exprlist ::= exprlist cnearset */
@@ -1157,7 +1108,7 @@ static YYACTIONTYPE yy_reduce(
 {
   yylhsminor.yy24 = sqlite3Fts5ParseImplicitAnd(pParse, yymsp[-1].minor.yy24, yymsp[0].minor.yy24);
 }
-#line 1160 "fts5parse.sql"
+#line 1111 "fts5parse.sql"
   yymsp[-1].minor.yy24 = yylhsminor.yy24;
         break;
       case 15: /* cnearset ::= nearset */
@@ -1165,7 +1116,7 @@ static YYACTIONTYPE yy_reduce(
 { 
   yylhsminor.yy24 = sqlite3Fts5ParseNode(pParse, FTS5_STRING, 0, 0, yymsp[0].minor.yy46); 
 }
-#line 1168 "fts5parse.sql"
+#line 1119 "fts5parse.sql"
   yymsp[0].minor.yy24 = yylhsminor.yy24;
         break;
       case 16: /* cnearset ::= colset COLON nearset */
@@ -1174,13 +1125,13 @@ static YYACTIONTYPE yy_reduce(
   yylhsminor.yy24 = sqlite3Fts5ParseNode(pParse, FTS5_STRING, 0, 0, yymsp[0].minor.yy46); 
   sqlite3Fts5ParseSetColset(pParse, yylhsminor.yy24, yymsp[-2].minor.yy11);
 }
-#line 1177 "fts5parse.sql"
+#line 1128 "fts5parse.sql"
   yymsp[-2].minor.yy24 = yylhsminor.yy24;
         break;
       case 17: /* nearset ::= phrase */
 #line 151 "fts5parse.y"
 { yylhsminor.yy46 = sqlite3Fts5ParseNearset(pParse, 0, yymsp[0].minor.yy53); }
-#line 1183 "fts5parse.sql"
+#line 1134 "fts5parse.sql"
   yymsp[0].minor.yy46 = yylhsminor.yy46;
         break;
       case 18: /* nearset ::= CARET phrase */
@@ -1189,7 +1140,7 @@ static YYACTIONTYPE yy_reduce(
   sqlite3Fts5ParseSetCaret(yymsp[0].minor.yy53);
   yymsp[-1].minor.yy46 = sqlite3Fts5ParseNearset(pParse, 0, yymsp[0].minor.yy53); 
 }
-#line 1192 "fts5parse.sql"
+#line 1143 "fts5parse.sql"
         break;
       case 19: /* nearset ::= STRING LP nearphrases neardist_opt RP */
 #line 156 "fts5parse.y"
@@ -1198,7 +1149,7 @@ static YYACTIONTYPE yy_reduce(
   sqlite3Fts5ParseSetDistance(pParse, yymsp[-2].minor.yy46, &yymsp[-1].minor.yy0);
   yylhsminor.yy46 = yymsp[-2].minor.yy46;
 }
-#line 1201 "fts5parse.sql"
+#line 1152 "fts5parse.sql"
   yymsp[-4].minor.yy46 = yylhsminor.yy46;
         break;
       case 20: /* nearphrases ::= phrase */
@@ -1206,7 +1157,7 @@ static YYACTIONTYPE yy_reduce(
 { 
   yylhsminor.yy46 = sqlite3Fts5ParseNearset(pParse, 0, yymsp[0].minor.yy53); 
 }
-#line 1209 "fts5parse.sql"
+#line 1160 "fts5parse.sql"
   yymsp[0].minor.yy46 = yylhsminor.yy46;
         break;
       case 21: /* nearphrases ::= nearphrases phrase */
@@ -1214,25 +1165,25 @@ static YYACTIONTYPE yy_reduce(
 {
   yylhsminor.yy46 = sqlite3Fts5ParseNearset(pParse, yymsp[-1].minor.yy46, yymsp[0].minor.yy53);
 }
-#line 1217 "fts5parse.sql"
+#line 1168 "fts5parse.sql"
   yymsp[-1].minor.yy46 = yylhsminor.yy46;
         break;
       case 22: /* neardist_opt ::= */
 #line 172 "fts5parse.y"
 { yymsp[1].minor.yy0.p = 0; yymsp[1].minor.yy0.n = 0; }
-#line 1223 "fts5parse.sql"
+#line 1174 "fts5parse.sql"
         break;
       case 23: /* neardist_opt ::= COMMA STRING */
 #line 173 "fts5parse.y"
 { yymsp[-1].minor.yy0 = yymsp[0].minor.yy0; }
-#line 1228 "fts5parse.sql"
+#line 1179 "fts5parse.sql"
         break;
       case 24: /* phrase ::= phrase PLUS STRING star_opt */
 #line 185 "fts5parse.y"
 { 
   yylhsminor.yy53 = sqlite3Fts5ParseTerm(pParse, yymsp[-3].minor.yy53, &yymsp[-1].minor.yy0, yymsp[0].minor.yy4);
 }
-#line 1235 "fts5parse.sql"
+#line 1186 "fts5parse.sql"
   yymsp[-3].minor.yy53 = yylhsminor.yy53;
         break;
       case 25: /* phrase ::= STRING star_opt */
@@ -1240,18 +1191,18 @@ static YYACTIONTYPE yy_reduce(
 { 
   yylhsminor.yy53 = sqlite3Fts5ParseTerm(pParse, 0, &yymsp[-1].minor.yy0, yymsp[0].minor.yy4);
 }
-#line 1243 "fts5parse.sql"
+#line 1194 "fts5parse.sql"
   yymsp[-1].minor.yy53 = yylhsminor.yy53;
         break;
       case 26: /* star_opt ::= STAR */
 #line 196 "fts5parse.y"
 { yymsp[0].minor.yy4 = 1; }
-#line 1249 "fts5parse.sql"
+#line 1200 "fts5parse.sql"
         break;
       case 27: /* star_opt ::= */
 #line 197 "fts5parse.y"
 { yymsp[1].minor.yy4 = 0; }
-#line 1254 "fts5parse.sql"
+#line 1205 "fts5parse.sql"
         break;
       default:
         break;
@@ -1319,7 +1270,7 @@ static void yy_syntax_error(
   sqlite3Fts5ParseError(
     pParse, "fts5: syntax error near \"%.*s\"",TOKEN.n,TOKEN.p
   );
-#line 1322 "fts5parse.sql"
+#line 1273 "fts5parse.sql"
 /************ End %syntax_error code ******************************************/
   sqlite3Fts5ParserARG_STORE /* Suppress warning about unused %extra_argument variable */
   sqlite3Fts5ParserCTX_STORE
@@ -1405,12 +1356,56 @@ void sqlite3Fts5Parser(
   }
 #endif
 
-  do{
+  while(1){ /* Exit by "break" */
+    assert( yypParser->yytos>=yypParser->yystack );
     assert( yyact==yypParser->yytos->stateno );
     yyact = yy_find_shift_action((YYCODETYPE)yymajor,yyact);
     if( yyact >= YY_MIN_REDUCE ){
-      yyact = yy_reduce(yypParser,yyact-YY_MIN_REDUCE,yymajor,
-                        yyminor sqlite3Fts5ParserCTX_PARAM);
+      unsigned int yyruleno = yyact - YY_MIN_REDUCE; /* Reduce by this rule */
+#ifndef NDEBUG
+      assert( yyruleno<(int)(sizeof(yyRuleName)/sizeof(yyRuleName[0])) );
+      if( yyTraceFILE ){
+        int yysize = yyRuleInfoNRhs[yyruleno];
+        if( yysize ){
+          fprintf(yyTraceFILE, "%sReduce %d [%s]%s, pop back to state %d.\n",
+            yyTracePrompt,
+            yyruleno, yyRuleName[yyruleno],
+            yyruleno<YYNRULE_WITH_ACTION ? "" : " without external action",
+            yypParser->yytos[yysize].stateno);
+        }else{
+          fprintf(yyTraceFILE, "%sReduce %d [%s]%s.\n",
+            yyTracePrompt, yyruleno, yyRuleName[yyruleno],
+            yyruleno<YYNRULE_WITH_ACTION ? "" : " without external action");
+        }
+      }
+#endif /* NDEBUG */
+
+      /* Check that the stack is large enough to grow by a single entry
+      ** if the RHS of the rule is empty.  This ensures that there is room
+      ** enough on the stack to push the LHS value */
+      if( yyRuleInfoNRhs[yyruleno]==0 ){
+#ifdef YYTRACKMAXSTACKDEPTH
+        if( (int)(yypParser->yytos - yypParser->yystack)>yypParser->yyhwm ){
+          yypParser->yyhwm++;
+          assert( yypParser->yyhwm ==
+                  (int)(yypParser->yytos - yypParser->yystack));
+        }
+#endif
+#if YYSTACKDEPTH>0 
+        if( yypParser->yytos>=yypParser->yystackEnd ){
+          yyStackOverflow(yypParser);
+          break;
+        }
+#else
+        if( yypParser->yytos>=&yypParser->yystack[yypParser->yystksz-1] ){
+          if( yyGrowStack(yypParser) ){
+            yyStackOverflow(yypParser);
+            break;
+          }
+        }
+#endif
+      }
+      yyact = yy_reduce(yypParser,yyruleno,yymajor,yyminor sqlite3Fts5ParserCTX_PARAM);
     }else if( yyact <= YY_MAX_SHIFTREDUCE ){
       yy_shift(yypParser,yyact,(YYCODETYPE)yymajor,yyminor);
 #ifndef YYNOERRORRECOVERY
@@ -1466,14 +1461,13 @@ void sqlite3Fts5Parser(
         yy_destructor(yypParser, (YYCODETYPE)yymajor, &yyminorunion);
         yymajor = YYNOCODE;
       }else{
-        while( yypParser->yytos >= yypParser->yystack
-            && (yyact = yy_find_reduce_action(
-                        yypParser->yytos->stateno,
-                        YYERRORSYMBOL)) > YY_MAX_SHIFTREDUCE
-        ){
+        while( yypParser->yytos > yypParser->yystack ){
+          yyact = yy_find_reduce_action(yypParser->yytos->stateno,
+                                        YYERRORSYMBOL);
+          if( yyact<=YY_MAX_SHIFTREDUCE ) break;
           yy_pop_parser_stack(yypParser);
         }
-        if( yypParser->yytos < yypParser->yystack || yymajor==0 ){
+        if( yypParser->yytos <= yypParser->yystack || yymajor==0 ){
           yy_destructor(yypParser,(YYCODETYPE)yymajor,&yyminorunion);
           yy_parse_failed(yypParser);
 #ifndef YYNOERRORRECOVERY
@@ -1523,7 +1517,7 @@ void sqlite3Fts5Parser(
       break;
 #endif
     }
-  }while( yypParser->yytos>yypParser->yystack );
+  }
 #ifndef NDEBUG
   if( yyTraceFILE ){
     yyStackEntry *i;
