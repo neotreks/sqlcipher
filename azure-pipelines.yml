@@ -1,0 +1,10 @@
+trigger: none
+
+pool:
+  MacMini
+
+steps:
+
+- task: CmdLine@2
+  inputs:
+    script: ./pushspec.sh
