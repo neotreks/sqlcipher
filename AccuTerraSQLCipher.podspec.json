@@ -18,6 +18,11 @@
   },
   "summary": "Full Database Encryption for SQLite.",
   "version": "4.5.6",
+  "resource_bundles": {
+    "SQLCipher": [
+      "PrivacyInfo.xcprivacy"
+    ]
+  },
   "subspecs": [
     {
       "compiler_flags": [
